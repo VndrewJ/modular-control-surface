@@ -35,7 +35,10 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(main_module main_module.cpp )
+add_executable(main_module 
+            main_module.cpp 
+            ${CMAKE_CURRENT_LIST_DIR}/lib/encoder.cpp
+            )
 
 pico_set_program_name(main_module "main_module")
 pico_set_program_version(main_module "0.1")
@@ -46,22 +49,20 @@ pico_enable_stdio_usb(main_module 1)
 
 # Add the standard library to the build
 target_link_libraries(main_module
-        pico_stdlib)
+        pico_stdlib
+        hardware_i2c
+        hardware_pio
+        )
 
 # Add the standard include files to the build
 target_include_directories(main_module PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
-        ${CMAKE_CURRENT_LIST_DIR}/../../../libs
+        ${CMAKE_CURRENT_LIST_DIR}/lib
 )
 
-# Add any user requested libraries
-target_link_libraries(main_module 
-        hardware_i2c
-        )
-
-# TODO: Add libraries from modular-control-surface/libs/ as needed
-# Example: add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../../libs/<lib_name> libs/<lib_name>)
-# Or link them: target_link_libraries(main_module <lib_name>)
+pico_generate_pio_header(main_module
+    ${CMAKE_CURRENT_LIST_DIR}/lib/quadrature_encoder.pio
+)
 
 pico_add_extra_outputs(main_module)
 
