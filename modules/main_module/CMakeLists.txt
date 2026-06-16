@@ -38,6 +38,7 @@ pico_sdk_init()
 add_executable(main_module 
             main_module.cpp 
             ${CMAKE_CURRENT_LIST_DIR}/lib/encoder/encoder.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/usb/hid_manager.c
             ${CMAKE_CURRENT_LIST_DIR}/usb/usb_descriptors.c
             ${CMAKE_CURRENT_LIST_DIR}/module_manager/module_manager.cpp
             )

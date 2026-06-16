@@ -14,7 +14,10 @@
     - Firmware DONE
     - Need to add cap for filtering (PCB), 1 cap for each pin
 2. USB C drivers
+    - Need to create a custom HID report ID for each peripheral type + submodule ID 
 3. I2C drivers
+    - Report IDs will have to be dynamically assigned as a user might want multiple of the same submodule. 
+    - Needs a 5 pinned magnetic connector, only have 4 pin for now.
 
 
 
