@@ -37,7 +37,9 @@ pico_sdk_init()
 
 add_executable(main_module 
             main_module.cpp 
-            ${CMAKE_CURRENT_LIST_DIR}/lib/encoder.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/lib/encoder/encoder.cpp
+            ${CMAKE_CURRENT_LIST_DIR}/usb/usb_descriptors.c
+            ${CMAKE_CURRENT_LIST_DIR}/module_manager/module_manager.cpp
             )
 
 pico_set_program_name(main_module "main_module")
@@ -52,16 +54,20 @@ target_link_libraries(main_module
         pico_stdlib
         hardware_i2c
         hardware_pio
+        tinyusb_device
+        tinyusb_board
         )
 
 # Add the standard include files to the build
 target_include_directories(main_module PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
-        ${CMAKE_CURRENT_LIST_DIR}/lib
+        ${CMAKE_CURRENT_LIST_DIR}/lib/encoder/
+        ${CMAKE_CURRENT_LIST_DIR}/usb/
+        ${CMAKE_CURRENT_LIST_DIR}/module_manager/
 )
 
 pico_generate_pio_header(main_module
-    ${CMAKE_CURRENT_LIST_DIR}/lib/quadrature_encoder.pio
+    ${CMAKE_CURRENT_LIST_DIR}/lib/encoder/quadrature_encoder.pio
 )
 
 pico_add_extra_outputs(main_module)
