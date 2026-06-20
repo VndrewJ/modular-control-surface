@@ -44,6 +44,8 @@
 #define BOARD_TUD_MAX_SPEED   OPT_MODE_DEFAULT_SPEED
 #endif
 
+#define CFG_TUSB_RHPORT0_MODE   (OPT_MODE_DEVICE | OPT_MODE_FULL_SPEED)
+
 //--------------------------------------------------------------------
 // COMMON CONFIGURATION
 //--------------------------------------------------------------------

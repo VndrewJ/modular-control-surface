@@ -50,7 +50,7 @@ uint8_t const * tud_descriptor_device_cb(void)
 
 uint8_t const desc_hid_report[] =
 {
-    HID_USAGE_PAGE(HID_USAGE_PAGE_VENDOR),
+    HID_USAGE_PAGE_N(HID_USAGE_PAGE_VENDOR, 2),
     HID_USAGE(0x01),
     HID_COLLECTION(HID_COLLECTION_APPLICATION),
 
