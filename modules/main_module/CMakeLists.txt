@@ -23,7 +23,8 @@ if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
 # ====================================================================================
-set(PICO_BOARD pico CACHE STRING "Board type")
+# Changed to waveshare_rp2040_zero for the Waveshare RP2040 Zero board. Adjust if using a different board.
+set(PICO_BOARD waveshare_rp2040_zero CACHE STRING "Board type") 
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
@@ -47,8 +48,8 @@ pico_set_program_name(main_module "main_module")
 pico_set_program_version(main_module "0.1")
 
 # Modify the below lines to enable/disable output over UART/USB
-pico_enable_stdio_uart(main_module 0)
-pico_enable_stdio_usb(main_module 1)
+pico_enable_stdio_uart(main_module 1)
+pico_enable_stdio_usb(main_module 0)
 
 # Add the standard library to the build
 target_link_libraries(main_module

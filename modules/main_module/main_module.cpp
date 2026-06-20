@@ -1,16 +1,14 @@
+/*
+HID Test, tests the HID connection to a PC with the previous encoder tests.
+*/
 #include <stdio.h>
+#include <stdint.h>
 
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 #include "hardware/gpio.h"
-#include "lib/encoder.h"
-
-// // I2C defines
-// // This example will use I2C0 on GPIO8 (SDA) and GPIO9 (SCL) running at 400KHz.
-// // Pins can be changed, see the GPIO function select table in the datasheet for information on GPIO assignments
-// #define I2C_PORT i2c0
-// #define I2C_SDA 8
-// #define I2C_SCL 9
+#include "lib/encoder/encoder.h"
+#include "usb/hid_manager.h"       
 
 // Encoder pins
 #define ENC_CLK_DT 0
@@ -18,14 +16,25 @@
 #define ENC_PIO pio0
 #define ENC_SM 0
 
+// Main module report ID
+#define MAIN_REPORT_ID (REPORT_ID_ENCODER | 0x01)
+
+struct encoder_report_t{
+    int8_t delta;
+    uint8_t button;
+};
+
 
 int main()
 {
+    tusb_init();                // Needs to be called first before anything else.
+    encoder_report_t report;
     bool button_state = 0;
-    stdio_init_all();
-    sleep_ms(2000); // Sleep for a bit to allow the console to initialize
 
-    printf("Initializing encoder...\n");
+    //stdio_init_all();
+
+
+    //printf("Initializing encoder...\n");
     Encoder encoder({
         .clk_dt_pin = ENC_CLK_DT,
         .sw_pin = ENC_SW,
@@ -33,37 +42,30 @@ int main()
         .sm = ENC_SM
     });
 
-    printf("Encoder initialized\n");
+    //printf("Encoder initialized\n");
 
-    // I2C Initialisation. Using it at 400Khz.
-    // i2c_init(I2C_PORT, 400*1000);
-    
-    // gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
-    // gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
-    // gpio_pull_up(I2C_SDA);
-    // gpio_pull_up(I2C_SCL);
-    // For more examples of I2C use see https://github.com/raspberrypi/pico-examples/tree/master/i2c
+    // Wait for USB to be mounted and ready
+    while(!usb_mounted()) {
+        tud_task(); // Handle USB events
+    }
     
     while (true) {
-        Encoder::Direction dir = encoder.read_enc();
-        bool button_pressed = encoder.read_sw();
 
-        // Prints if encoder state has changed
-        if (dir != Encoder::Direction::NONE) {
-            printf("Encoder direction: %d\n", static_cast<int>(dir));
+        tud_task(); // Handle USB events
+        report.delta = static_cast<int8_t>(encoder.read_enc());
+        report.button = static_cast<uint8_t>(encoder.read_sw());
+
+        // Sends if encoder state has changed
+        if (report.delta != 0) {
+            send_hid_report(MAIN_REPORT_ID, &report, sizeof(report));
         }
 
         // Prints if button is pressed
-        if (button_pressed != button_state) {
-            button_state = button_pressed;
-            if (button_pressed) {
-                printf("Button pressed!\n");
-            } else {
-                printf("Button released!\n");
-            }
+        if (report.button != button_state) {
+            button_state = report.button;
+            send_hid_report(MAIN_REPORT_ID, &report, sizeof(report));
         }
-
-        // 1khz update rate
         sleep_ms(1);
+        tud_hid_ready(); // Ensure the report is sent before the next loop
     }
 }
